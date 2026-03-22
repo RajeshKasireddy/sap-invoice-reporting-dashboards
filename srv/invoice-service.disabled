@@ -1,0 +1,51 @@
+const cds = require('@sap/cds');
+
+module.exports = cds.service.impl(async function () {
+
+  const { Invoices } = this.entities;
+
+  // Enhance invoice data
+  this.after('READ', Invoices, (data) => {
+    const rows = Array.isArray(data) ? data : [data];
+
+    rows.forEach((row) => {
+      if (!row) return;
+
+      row.statusFlag = row.paymentStatus === 'PAID'
+        ? 'Cleared'
+        : 'Action Required';
+
+      if (row.total >= 3000) {
+        row.priority = 'High Value';
+      } else if (row.total >= 2000) {
+        row.priority = 'Medium Value';
+      } else {
+        row.priority = 'Normal';
+      }
+    });
+  });
+
+  // Summary logic
+  this.on('READ', 'InvoiceSummary', async () => {
+
+    const tx = cds.transaction(this);
+    const invoices = await tx.run(SELECT.from(Invoices));
+
+    const totalRevenue = invoices.reduce((sum, i) => sum + Number(i.total), 0);
+
+    const paidRevenue = invoices
+      .filter(i => i.paymentStatus === 'PAID')
+      .reduce((sum, i) => sum + Number(i.total), 0);
+
+    const pendingRevenue = invoices
+      .filter(i => i.paymentStatus === 'PENDING')
+      .reduce((sum, i) => sum + Number(i.total), 0);
+
+    return [
+      { metric: 'Total Revenue', value: totalRevenue },
+      { metric: 'Paid Revenue', value: paidRevenue },
+      { metric: 'Pending Revenue', value: pendingRevenue }
+    ];
+  });
+
+});

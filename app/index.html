@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SAP Invoice Reporting Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f4f6f8;
+      color: #222;
+    }
+
+    header {
+      background: white;
+      padding: 24px 32px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    header h1 {
+      margin: 0;
+      color: #0a6ed1;
+      font-size: 38px;
+    }
+
+    header p {
+      margin-top: 10px;
+      font-size: 16px;
+    }
+
+    .container {
+      padding: 24px 32px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .card h3 {
+      margin: 0 0 10px 0;
+      color: #555;
+      font-size: 16px;
+    }
+
+    .card .value {
+      font-size: 28px;
+      font-weight: bold;
+      color: #0a6ed1;
+    }
+
+    .section {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .section h2 {
+      margin-top: 0;
+      color: #0a6ed1;
+    }
+
+    .actions a {
+      display: inline-block;
+      margin-right: 12px;
+      margin-bottom: 10px;
+      color: #0a6ed1;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 14px;
+    }
+
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      text-align: left;
+    }
+
+    th {
+      background: #eef4fb;
+    }
+
+    .status-paid {
+      color: green;
+      font-weight: bold;
+    }
+
+    .status-pending {
+      color: red;
+      font-weight: bold;
+    }
+
+    canvas {
+      max-width: 100%;
+      margin-top: 12px;
+    }
+
+    @media (max-width: 900px) {
+      .cards {
+        grid-template-columns: 1fr;
+      }
+
+      table {
+        display: block;
+        overflow-x: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>📊 SAP Invoice Reporting Dashboard</h1>
+    <p>Built using SAP CAP on SAP BTP</p>
+  </header>
+
+  <div class="container">
+    <div class="cards">
+      <div class="card">
+        <h3>Total Invoices</h3>
+        <div class="value" id="totalInvoices">0</div>
+      </div>
+      <div class="card">
+        <h3>Total Revenue</h3>
+        <div class="value" id="totalRevenue">0</div>
+      </div>
+      <div class="card">
+        <h3>Paid Invoices</h3>
+        <div class="value" id="paidInvoices">0</div>
+      </div>
+    </div>
+
+    <div class="section actions">
+      <h2>Actions</h2>
+      <a href="/create-invoice.html">Create New Invoice</a>
+      <a href="/odata/v4/invoice/Invoices" target="_blank">Open Raw Invoice API</a>
+    </div>
+
+    <div class="section">
+      <h2>Invoice Table</h2>
+      <table id="invoiceTable">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Customer</th>
+            <th>Date</th>
+            <th>Amount</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Region</th>
+            <th>Category</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <h2>Revenue by Region</h2>
+      <canvas id="regionChart"></canvas>
+    </div>
+  </div>
+
+  <script>
+    async function loadDashboard() {
+      const response = await fetch('/odata/v4/invoice/Invoices');
+      const data = await response.json();
+      const invoices = data.value || [];
+
+      document.getElementById('totalInvoices').innerText = invoices.length;
+
+      const totalRevenue = invoices.reduce((sum, inv) => sum + Number(inv.total || 0), 0);
+      document.getElementById('totalRevenue').innerText = totalRevenue.toFixed(2);
+
+      const paidCount = invoices.filter(inv => inv.paymentStatus === 'PAID').length;
+      document.getElementById('paidInvoices').innerText = paidCount;
+
+      const tbody = document.querySelector('#invoiceTable tbody');
+      tbody.innerHTML = '';
+
+      invoices.forEach(inv => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${inv.ID}</td>
+          <td>${inv.customerName}</td>
+          <td>${inv.invoiceDate}</td>
+          <td>${inv.amount}</td>
+          <td>${inv.total}</td>
+          <td class="${inv.paymentStatus === 'PAID' ? 'status-paid' : 'status-pending'}">
+            ${inv.paymentStatus}
+          </td>
+          <td>${inv.customerRegion}</td>
+          <td>${inv.invoiceCategory}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      const regionMap = {};
+      invoices.forEach(inv => {
+        const region = inv.customerRegion || 'Unknown';
+        regionMap[region] = (regionMap[region] || 0) + Number(inv.total || 0);
+      });
+
+      const labels = Object.keys(regionMap);
+      const values = Object.values(regionMap);
+
+      new Chart(document.getElementById('regionChart'), {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Revenue',
+            data: values
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: true }
+          }
+        }
+      });
+    }
+
+    loadDashboard();
+  </script>
+</body>
+</html>

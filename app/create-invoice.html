@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Invoice</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      padding: 30px;
+    }
+    .box {
+      background: white;
+      padding: 24px;
+      max-width: 600px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    h1 {
+      color: #0a6ed1;
+    }
+    label {
+      display: block;
+      margin-top: 12px;
+      font-weight: bold;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      box-sizing: border-box;
+    }
+    button {
+      margin-top: 18px;
+      padding: 12px;
+      width: 100%;
+      background: #0a6ed1;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 8px;
+    }
+    #msg {
+      margin-top: 14px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>Create New Invoice</h1>
+
+    <label>ID</label>
+    <input id="ID" type="number" />
+
+    <label>Customer Name</label>
+    <input id="customerName" type="text" />
+
+    <label>Invoice Date</label>
+    <input id="invoiceDate" type="date" />
+
+    <label>Amount</label>
+    <input id="amount" type="number" step="0.01" />
+
+    <label>Tax</label>
+    <input id="tax" type="number" step="0.01" />
+
+    <label>Total</label>
+    <input id="total" type="number" step="0.01" />
+
+    <label>Payment Status</label>
+    <select id="paymentStatus">
+      <option value="PENDING">PENDING</option>
+      <option value="PAID">PAID</option>
+    </select>
+
+    <label>Customer Region</label>
+    <input id="customerRegion" type="text" />
+
+    <label>Invoice Category</label>
+    <input id="invoiceCategory" type="text" />
+
+    <button onclick="createInvoice()">Submit</button>
+    <div id="msg"></div>
+  </div>
+
+  <script>
+  async function createInvoice() {
+    const payload = {
+      ID: Number(document.getElementById('ID').value),
+      customerName: document.getElementById('customerName').value,
+      invoiceDate: document.getElementById('invoiceDate').value,
+      amount: Number(document.getElementById('amount').value),
+      tax: Number(document.getElementById('tax').value),
+      total: Number(document.getElementById('total').value),
+      paymentStatus: document.getElementById('paymentStatus').value,
+      customerRegion: document.getElementById('customerRegion').value,
+      invoiceCategory: document.getElementById('invoiceCategory').value
+    };
+
+    try {
+      const res = await fetch('/odata/v4/invoice/Invoices', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const responseText = await res.text();
+
+      if (res.ok) {
+        document.getElementById('msg').innerText = '✅ Invoice created successfully!';
+      } else {
+        document.getElementById('msg').innerText =
+          '❌ Error: ' + responseText;
+      }
+    } catch (error) {
+      document.getElementById('msg').innerText =
+        '⚠️ Request failed: ' + error.message;
+    }
+  }
+</script>

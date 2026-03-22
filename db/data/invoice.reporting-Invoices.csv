@@ -1,0 +1,21 @@
+ID,customerName,invoiceDate,amount,tax,total,paymentStatus,customerRegion,invoiceCategory
+1,Claire Gute,2016-11-08,261.96,47.15,309.11,PENDING,South,Furniture
+2,Claire Gute,2016-11-08,731.94,131.75,863.69,PENDING,South,Furniture
+3,Darrin Van Huff,2016-12-06,14.62,2.63,17.25,PENDING,West,Office Supplies
+4,Sean O'Donnell,2015-10-11,957.58,172.36,1129.94,PENDING,South,Furniture
+5,Sean O'Donnell,2015-10-11,22.37,4.03,26.39,PENDING,South,Office Supplies
+6,Brosina Hoffman,2014-09-06,48.86,8.79,57.65,PENDING,West,Furniture
+7,Brosina Hoffman,2014-09-06,7.28,1.31,8.59,PENDING,West,Office Supplies
+8,Brosina Hoffman,2014-09-06,907.15,163.29,1070.44,PENDING,West,Technology
+9,Brosina Hoffman,2014-09-06,18.50,3.33,21.83,PENDING,West,Office Supplies
+10,Brosina Hoffman,2014-09-06,114.90,20.68,135.58,PENDING,West,Office Supplies
+11,Andrew Allen,2017-04-15,15.55,2.80,18.35,PENDING,South,Office Supplies
+12,Irene Maddox,2016-12-05,407.98,73.44,481.41,PENDING,West,Office Supplies
+13,Harold Pawlan,2015-11-22,68.81,12.39,81.20,PENDING,Central,Office Supplies
+14,Harold Pawlan,2015-11-22,2.54,0.46,3.00,PENDING,Central,Office Supplies
+15,Pete Kriz,2014-11-11,665.88,119.86,785.74,PENDING,Central,Office Supplies
+16,Alejandra Grove,2014-05-13,55.50,9.99,65.49,PENDING,West,Office Supplies
+17,Zuess Donatelli,2014-08-27,8.56,1.54,10.10,PENDING,West,Office Supplies
+18,Kelly Williams,2015-09-17,213.48,38.43,251.91,PENDING,East,Technology
+19,Kelly Williams,2015-09-17,31.20,5.62,36.82,PENDING,East,Office Supplies
+20,Christopher Martinez,2016-03-24,100.24,18.04,118.28,PENDING,Central,Furniture
