@@ -32,7 +32,7 @@
 <body>
   <header>
     <h1>📊 SAP Invoice Reporting Dashboard</h1>
-    <p>Built using SAP CAP on SAP BTP</p>
+    <p>Built using SAP CAP project structure</p>
   </header>
 
   <div class="container">
@@ -54,7 +54,6 @@
     <div class="section actions">
       <h2>Actions</h2>
       <a href="/create-invoice.html">Create New Invoice</a>
-      <a href="/odata/v4/invoice/Invoices" target="_blank">Open Raw Invoice API</a>
     </div>
 
     <div class="section">
@@ -83,22 +82,37 @@
   </div>
 
   <script>
-    async function loadDashboard() {
-      const response = await fetch('/odata/v4/invoice/Invoices');
-      const data = await response.json();
-      const invoices = data.value || [];
+    const seedData = [
+      { ID: 1, customerName: "Claire Gute", invoiceDate: "2016-11-08", amount: 261.96, tax: 47.15, total: 309.11, paymentStatus: "PENDING", customerRegion: "South", invoiceCategory: "Furniture" },
+      { ID: 2, customerName: "Claire Gute", invoiceDate: "2016-11-08", amount: 731.94, tax: 131.75, total: 863.69, paymentStatus: "PENDING", customerRegion: "South", invoiceCategory: "Furniture" },
+      { ID: 3, customerName: "Darrin Van Huff", invoiceDate: "2016-12-06", amount: 14.62, tax: 2.63, total: 17.25, paymentStatus: "PENDING", customerRegion: "West", invoiceCategory: "Office Supplies" },
+      { ID: 4, customerName: "Sean O'Donnell", invoiceDate: "2015-10-11", amount: 957.58, tax: 172.36, total: 1129.94, paymentStatus: "PENDING", customerRegion: "South", invoiceCategory: "Furniture" },
+      { ID: 5, customerName: "Sean O'Donnell", invoiceDate: "2015-10-11", amount: 22.37, tax: 4.03, total: 26.39, paymentStatus: "PENDING", customerRegion: "South", invoiceCategory: "Office Supplies" },
+      { ID: 6, customerName: "Brosina Hoffman", invoiceDate: "2014-09-06", amount: 48.86, tax: 8.79, total: 57.65, paymentStatus: "PENDING", customerRegion: "West", invoiceCategory: "Furniture" },
+      { ID: 7, customerName: "Brosina Hoffman", invoiceDate: "2014-09-06", amount: 7.28, tax: 1.31, total: 8.59, paymentStatus: "PENDING", customerRegion: "West", invoiceCategory: "Office Supplies" },
+      { ID: 8, customerName: "Brosina Hoffman", invoiceDate: "2014-09-06", amount: 907.15, tax: 163.29, total: 1070.44, paymentStatus: "PAID", customerRegion: "West", invoiceCategory: "Technology" },
+      { ID: 9, customerName: "Brosina Hoffman", invoiceDate: "2014-09-06", amount: 18.50, tax: 3.33, total: 21.83, paymentStatus: "PENDING", customerRegion: "West", invoiceCategory: "Office Supplies" },
+      { ID: 10, customerName: "Brosina Hoffman", invoiceDate: "2014-09-06", amount: 114.90, tax: 20.68, total: 135.58, paymentStatus: "PENDING", customerRegion: "West", invoiceCategory: "Office Supplies" }
+    ];
+
+    function getInvoices() {
+      const saved = localStorage.getItem("invoiceData");
+      if (saved) return JSON.parse(saved);
+      localStorage.setItem("invoiceData", JSON.stringify(seedData));
+      return seedData;
+    }
+
+    function renderDashboard() {
+      const invoices = getInvoices();
 
       document.getElementById('totalInvoices').innerText = invoices.length;
-
-      const totalRevenue = invoices.reduce((sum, inv) => sum + Number(inv.total || 0), 0);
-      document.getElementById('totalRevenue').innerText = totalRevenue.toFixed(2);
-
-      const paidCount = invoices.filter(inv => inv.paymentStatus === 'PAID').length;
-      document.getElementById('paidInvoices').innerText = paidCount;
+      document.getElementById('totalRevenue').innerText =
+        invoices.reduce((sum, inv) => sum + Number(inv.total || 0), 0).toFixed(2);
+      document.getElementById('paidInvoices').innerText =
+        invoices.filter(inv => inv.paymentStatus === 'PAID').length;
 
       const tbody = document.querySelector('#invoiceTable tbody');
       tbody.innerHTML = '';
-
       invoices.forEach(inv => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
@@ -125,23 +139,17 @@
 
       const ctx = document.getElementById('regionChart');
       if (window.regionChartInstance) window.regionChartInstance.destroy();
-
       window.regionChartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
           labels,
-          datasets: [{
-            label: 'Revenue',
-            data: values
-          }]
+          datasets: [{ label: 'Revenue', data: values }]
         },
-        options: {
-          responsive: true
-        }
+        options: { responsive: true }
       });
     }
 
-    loadDashboard();
+    renderDashboard();
   </script>
 </body>
 </html>

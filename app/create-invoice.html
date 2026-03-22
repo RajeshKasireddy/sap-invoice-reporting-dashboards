@@ -19,7 +19,7 @@
     <h1>Create New Invoice</h1>
 
     <label>ID</label>
-    <input id="ID" type="number" />
+    <input id="ID" type="number" readonly />
 
     <label>Customer Name</label>
     <input id="customerName" type="text" />
@@ -53,23 +53,28 @@
   </div>
 
   <script>
+    function getInvoices() {
+      return JSON.parse(localStorage.getItem("invoiceData") || "[]");
+    }
+
+    function setInvoices(rows) {
+      localStorage.setItem("invoiceData", JSON.stringify(rows));
+    }
+
     function calcTotal() {
       const amount = Number(document.getElementById('amount').value || 0);
       const tax = Number(document.getElementById('tax').value || 0);
       document.getElementById('total').value = (amount + tax).toFixed(2);
     }
 
-    async function setNextId() {
-      try {
-        const res = await fetch('/odata/v4/invoice/Invoices');
-        const data = await res.json();
-        const rows = data.value || [];
-        const maxId = rows.length ? Math.max(...rows.map(r => Number(r.ID))) : 0;
-        document.getElementById('ID').value = maxId + 1;
-      } catch (e) {}
+    function setNextId() {
+      const rows = getInvoices();
+      const maxId = rows.length ? Math.max(...rows.map(r => Number(r.ID))) : 0;
+      document.getElementById('ID').value = maxId + 1;
     }
 
-    async function createInvoice() {
+    function createInvoice() {
+      const rows = getInvoices();
       const payload = {
         ID: Number(document.getElementById('ID').value),
         customerName: document.getElementById('customerName').value,
@@ -82,24 +87,15 @@
         invoiceCategory: document.getElementById('invoiceCategory').value
       };
 
-      try {
-        const res = await fetch('/odata/v4/invoice/Invoices', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-
-        const responseText = await res.text();
-
-        if (res.ok) {
-          document.getElementById('msg').innerText = '✅ Invoice created successfully!';
-          setNextId();
-        } else {
-          document.getElementById('msg').innerText = '❌ Error: ' + responseText;
-        }
-      } catch (error) {
-        document.getElementById('msg').innerText = '⚠️ Request failed: ' + error.message;
+      if (!payload.customerName || !payload.invoiceDate || !payload.customerRegion || !payload.invoiceCategory) {
+        document.getElementById('msg').innerText = 'Please fill all fields';
+        return;
       }
+
+      rows.push(payload);
+      setInvoices(rows);
+      document.getElementById('msg').innerText = 'Invoice created successfully';
+      setNextId();
     }
 
     setNextId();
