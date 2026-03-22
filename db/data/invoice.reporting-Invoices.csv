@@ -14,8 +14,8 @@ ID,customerName,invoiceDate,amount,tax,total,paymentStatus,customerRegion,invoic
 13,Harold Pawlan,2015-11-22,68.81,12.39,81.20,PENDING,Central,Office Supplies
 14,Harold Pawlan,2015-11-22,2.54,0.46,3.00,PENDING,Central,Office Supplies
 15,Pete Kriz,2014-11-11,665.88,119.86,785.74,PENDING,Central,Office Supplies
-16,Alejandra Grove,2014-05-13,55.50,9.99,65.49,PENDING,West,Office Supplies
-17,Zuess Donatelli,2014-08-27,8.56,1.54,10.10,PENDING,West,Office Supplies
+16,Alejandro Grove,2014-05-13,55.50,9.99,65.49,PENDING,West,Office Supplies
+17,Zuschuss Donatelli,2014-08-27,8.56,1.54,10.10,PENDING,West,Office Supplies
 18,Kelly Williams,2015-09-17,213.48,38.43,251.91,PENDING,East,Technology
 19,Kelly Williams,2015-09-17,31.20,5.62,36.82,PENDING,East,Office Supplies
 20,Christopher Martinez,2016-03-24,100.24,18.04,118.28,PENDING,Central,Furniture

@@ -6,123 +6,26 @@
   <title>SAP Invoice Reporting Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      background: #f4f6f8;
-      color: #222;
-    }
-
-    header {
-      background: white;
-      padding: 24px 32px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    }
-
-    header h1 {
-      margin: 0;
-      color: #0a6ed1;
-      font-size: 38px;
-    }
-
-    header p {
-      margin-top: 10px;
-      font-size: 16px;
-    }
-
-    .container {
-      padding: 24px 32px;
-    }
-
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-
-    .card {
-      background: white;
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    }
-
-    .card h3 {
-      margin: 0 0 10px 0;
-      color: #555;
-      font-size: 16px;
-    }
-
-    .card .value {
-      font-size: 28px;
-      font-weight: bold;
-      color: #0a6ed1;
-    }
-
-    .section {
-      background: white;
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 24px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    }
-
-    .section h2 {
-      margin-top: 0;
-      color: #0a6ed1;
-    }
-
-    .actions a {
-      display: inline-block;
-      margin-right: 12px;
-      margin-bottom: 10px;
-      color: #0a6ed1;
-      text-decoration: none;
-      font-weight: bold;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 12px;
-      font-size: 14px;
-    }
-
-    th, td {
-      padding: 10px;
-      border-bottom: 1px solid #ddd;
-      text-align: left;
-    }
-
-    th {
-      background: #eef4fb;
-    }
-
-    .status-paid {
-      color: green;
-      font-weight: bold;
-    }
-
-    .status-pending {
-      color: red;
-      font-weight: bold;
-    }
-
-    canvas {
-      max-width: 100%;
-      margin-top: 12px;
-    }
-
+    body { font-family: Arial, sans-serif; margin: 0; background: #f4f6f8; color: #222; }
+    header { background: white; padding: 24px 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    header h1 { margin: 0; color: #0a6ed1; font-size: 38px; }
+    header p { margin-top: 10px; font-size: 16px; }
+    .container { padding: 24px 32px; }
+    .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+    .card, .section { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .card h3 { margin: 0 0 10px 0; color: #555; font-size: 16px; }
+    .card .value { font-size: 28px; font-weight: bold; color: #0a6ed1; }
+    .section { margin-bottom: 24px; }
+    .section h2 { margin-top: 0; color: #0a6ed1; }
+    .actions a { display: inline-block; margin-right: 12px; margin-bottom: 10px; color: #0a6ed1; text-decoration: none; font-weight: bold; }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 14px; }
+    th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: left; }
+    th { background: #eef4fb; }
+    .status-paid { color: green; font-weight: bold; }
+    .status-pending { color: red; font-weight: bold; }
     @media (max-width: 900px) {
-      .cards {
-        grid-template-columns: 1fr;
-      }
-
-      table {
-        display: block;
-        overflow-x: auto;
-      }
+      .cards { grid-template-columns: 1fr; }
+      table { display: block; overflow-x: auto; }
     }
   </style>
 </head>
@@ -204,9 +107,7 @@
           <td>${inv.invoiceDate}</td>
           <td>${inv.amount}</td>
           <td>${inv.total}</td>
-          <td class="${inv.paymentStatus === 'PAID' ? 'status-paid' : 'status-pending'}">
-            ${inv.paymentStatus}
-          </td>
+          <td class="${inv.paymentStatus === 'PAID' ? 'status-paid' : 'status-pending'}">${inv.paymentStatus}</td>
           <td>${inv.customerRegion}</td>
           <td>${inv.invoiceCategory}</td>
         `;
@@ -222,20 +123,20 @@
       const labels = Object.keys(regionMap);
       const values = Object.values(regionMap);
 
-      new Chart(document.getElementById('regionChart'), {
+      const ctx = document.getElementById('regionChart');
+      if (window.regionChartInstance) window.regionChartInstance.destroy();
+
+      window.regionChartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: labels,
+          labels,
           datasets: [{
             label: 'Revenue',
             data: values
           }]
         },
         options: {
-          responsive: true,
-          plugins: {
-            legend: { display: true }
-          }
+          responsive: true
         }
       });
     }
