@@ -5,6 +5,10 @@
   "dependencies": {
     "@sap/cds": "^9"
   },
+  "scripts": {
+    "start": "cds serve",
+    "dev": "cds watch"
+  },
   "cds": {
     "requires": {
       "db": {
